@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Pad System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f4f8;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border: 2px solid #0066cc;
+            border-radius: 10px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #0066cc;
+            padding-bottom: 10px;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+        .header-left svg {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+        }
+        .header-right {
+            text-align: right;
+        }
+        .doctor-info h1 {
+            margin: 0;
+            color: #0066cc;
+            font-size: 24px;
+        }
+        .doctor-info p {
+            margin: 5px 0;
+            color: #333;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .rx {
+            font-size: 36px;
+            color: #0066cc;
+            margin: 20px 0;
+        }
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #0066cc;
+            padding-top: 10px;
+            margin-top: 20px;
+        }
+        .footer svg {
+            width: 50px;
+            height: 50px;
+        }
+        .contact-info p {
+            margin: 5px 0;
+            color: #333;
+        }
+        .buttons {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .buttons button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            background-color: #0066cc;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .buttons button:hover {
+            background-color: #0055aa;
+        }
+        #preview {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 20px;
+            background: #f9f9f9;
+        }
+        @media print {
+            .buttons, #preview-header {
+                display: none;
+            }
+            .container {
+                border: none;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#0066cc" stroke-width="2">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    <path d="M18 8.5c0-2.21-1.79-4-4-4"/>
+                </svg>
+                <div class="doctor-info">
+                    <h1>Dr. Doctor Name</h1>
+                    <p>QUALIFICATION</p>
+                    <p>Certification 12548-20</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <p>HOSPITAL</p>
+                <p>SLOGAN HERE</p>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="patientName">Patient Name:</label>
+            <input type="text" id="patientName" placeholder="Enter patient name">
+        </div>
+        <div class="form-group">
+            <label for="address">Address:</label>
+            <input type="text" id="address" placeholder="Enter address">
+        </div>
+        <div class="form-group">
+            <label for="age">Age:</label>
+            <input type="number" id="age" placeholder="Enter age">
+        </div>
+        <div class="form-group">
+            <label for="date">Date:</label>
+            <input type="date" id="date">
+        </div>
+        <div class="form-group">
+            <label for="diagnosis">Diagnosis:</label>
+            <input type="text" id="diagnosis" placeholder="Enter diagnosis">
+        </div>
+        <div class="rx">Rx</div>
+        <div class="form-group">
+            <label for="prescription">Prescription:</label>
+            <textarea id="prescription" rows="5" placeholder="Enter prescription details"></textarea>
+        </div>
+
+        <div class="footer">
+            <div class="contact-info">
+                <p>📞 55 47 79 94 15 / 55 47 79 94 18</p>
+                <p>📧 email_here@email.com</p>
+                <p>📍 Address Here Number 123</p>
+                <p>🌐 www.webpage.com</p>
+            </div>
+            <svg viewBox="0 0 24 24" fill="none" stroke="#0066cc" stroke-width="2">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+            </svg>
+        </div>
+
+        <div class="buttons">
+            <button onclick="saveData()">Save</button>
+            <button onclick="showPreview()">Preview</button>
+            <button onclick="printReceipt()">Print</button>
+            <button onclick="retrieveData()">Retrieve Past Records</button>
+        </div>
+
+        <div id="preview" style="display: none;">
+            <h2 id="preview-header">Preview</h2>
+            <div id="preview-content"></div>
+        </div>
+    </div>
+
+    <script>
+        let db;
+        const request = indexedDB.open("DoctorPadDB", 1);
+
+        request.onupgradeneeded = function(event) {
+            db = event.target.result;
+            const objectStore = db.createObjectStore("prescriptions", { keyPath: "id", autoIncrement: true });
+            objectStore.createIndex("patientName", "patientName", { unique: false });
+        };
+
+        request.onsuccess = function(event) {
+            db = event.target.result;
+            console.log("Database opened successfully");
+        };
+
+        request.onerror = function(event) {
+            console.error("Database error:", event.target.errorCode);
+        };
+
+        function saveData() {
+            const patientName = document.getElementById("patientName").value;
+            const address = document.getElementById("address").value;
+            const age = document.getElementById("age").value;
+            const date = document.getElementById("date").value;
+            const diagnosis = document.getElementById("diagnosis").value;
+            const prescription = document.getElementById("prescription").value;
+
+            const data = { patientName, address, age, date, diagnosis, prescription, timestamp: new Date() };
+            const transaction = db.transaction(["prescriptions"], "readwrite");
+            const objectStore = transaction.objectStore("prescriptions");
+            const request = objectStore.add(data);
+
+            request.onsuccess = function() {
+                alert("Data saved successfully!");
+            };
+            request.onerror = function() {
+                alert("Error saving data.");
+            };
+        }
+
+        function showPreview() {
+            const patientName = document.getElementById("patientName").value;
+            const address = document.getElementById("address").value;
+            const age = document.getElementById("age").value;
+            const date = document.getElementById("date").value;
+            const diagnosis = document.getElementById("diagnosis").value;
+            const prescription = document.getElementById("prescription").value;
+
+            const previewContent = `
+                <div class="header">
+                    <div class="header-left">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#0066cc" stroke-width="2">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                            <path d="M18 8.5c0-2.21-1.79-4-4-4"/>
+                        </svg>
+                        <div class="doctor-info">
+                            <h1>Dr. Doctor Name</h1>
+                            <p>QUALIFICATION</p>
+                            <p>Certification 12548-20</p>
+                        </div>
+                    </div>
+                    <div class="header-right">
+                        <p>HOSPITAL</p>
+                        <p>SLOGAN HERE</p>
+                    </div>
+                </div>
+                <div class="form-group"><strong>Patient Name:</strong> ${patientName}</div>
+                <div class="form-group"><strong>Address:</strong> ${address}</div>
+                <div class="form-group"><strong>Age:</strong> ${age}</div>
+                <div class="form-group"><strong>Date:</strong> ${date}</div>
+                <div class="form-group"><strong>Diagnosis:</strong> ${diagnosis}</div>
+                <div class="rx">Rx</div>
+                <div class="form-group"><strong>Prescription:</strong><br>${prescription.replace(/\n/g, "<br>")}</div>
+                <div class="footer">
+                    <div class="contact-info">
+                        <p>📞 55 47 79 94 15 / 55 47 79 94 18</p>
+                        <p>📧 email_here@email.com</p>
+                        <p>📍 Address Here Number 123</p>
+                        <p>🌐 www.webpage.com</p>
+                    </div>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#0066cc" stroke-width="2">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                    </svg>
+                </div>
+            `;
+
+            const previewDiv = document.getElementById("preview");
+            previewDiv.style.display = "block";
+            document.getElementById("preview-content").innerHTML = previewContent;
+        }
+
+        function printReceipt() {
+            window.print();
+        }
+
+        function retrieveData() {
+            const transaction = db.transaction(["prescriptions"], "readonly");
+            const objectStore = transaction.objectStore("prescriptions");
+            const request = objectStore.getAll();
+
+            request.onsuccess = function(event) {
+                const records = event.target.result;
+                let output = "<h2>Past Records</h2>";
+                records.forEach(record => {
+                    output += `
+                        <div style="border-bottom: 1px solid #ccc; padding: 10px;">
+                            <p><strong>Patient Name:</strong> ${record.patientName}</p>
+                            <p><strong>Date:</strong> ${record.date}</p>
+                            <p><strong>Diagnosis:</strong> ${record.diagnosis}</p>
+                            <p><strong>Prescription:</strong><br>${record.prescription.replace(/\n/g, "<br>")}</p>
+                        </div>
+                    `;
+                });
+                const previewDiv = document.getElementById("preview");
+                previewDiv.style.display = "block";
+                document.getElementById("preview-content").innerHTML = output;
+            };
+        }
+    </script>
+</body>
+</html>

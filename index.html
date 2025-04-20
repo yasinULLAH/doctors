@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Prescription Pad</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f7fc;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px; /* A4-ish width */
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #0056b3;
+            border-bottom: 2px solid #0056b3;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        h3 {
+            color: #007bff;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            border-left: 4px solid #007bff;
+            padding-left: 8px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+            font-size: 0.9em;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="date"],
+        input[type="url"],
+        textarea {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.95em;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="email"]:focus,
+        input[type="tel"]:focus,
+        input[type="date"]:focus,
+        input[type="url"]:focus,
+        textarea:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .form-row > div {
+            flex: 1;
+        }
+
+        .form-row input {
+            margin-bottom: 0; /* Remove default bottom margin inside row */
+        }
+
+        /* Rx Section */
+        #rxSection table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        #rxSection th, #rxSection td {
+            border: 1px solid #ddd;
+            padding: 8px 10px;
+            text-align: left;
+            font-size: 0.9em;
+        }
+
+        #rxSection th {
+            background-color: #e9ecef;
+            font-weight: 600;
+        }
+
+        #rxSection input[type="text"],
+        #rxSection input[type="number"] {
+            width: calc(100% - 16px); /* Adjust for padding */
+            padding: 6px;
+            margin-bottom: 0;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+
+        #rxSection .action-col {
+            width: 50px;
+            text-align: center;
+        }
+
+        /* Buttons */
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 30px;
+            justify-content: center;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            font-weight: 500;
+        }
+
+        button:active {
+             transform: scale(0.98);
+        }
+
+        .btn-primary { background-color: #007bff; color: white; }
+        .btn-primary:hover { background-color: #0056b3; }
+
+        .btn-secondary { background-color: #6c757d; color: white; }
+        .btn-secondary:hover { background-color: #5a6268; }
+
+        .btn-success { background-color: #28a745; color: white; }
+        .btn-success:hover { background-color: #218838; }
+
+        .btn-warning { background-color: #ffc107; color: #333; }
+        .btn-warning:hover { background-color: #e0a800; }
+
+        .btn-danger { background-color: #dc3545; color: white; }
+        .btn-danger:hover { background-color: #c82333; }
+
+        .btn-info { background-color: #17a2b8; color: white; }
+        .btn-info:hover { background-color: #138496; }
+
+        /* Settings & Load Modals */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.5); /* Black w/ opacity */
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto; /* 10% from the top and centered */
+            padding: 30px;
+            border: 1px solid #888;
+            width: 80%; /* Could be more or less, depending on screen size */
+            max-width: 600px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .close-btn {
+            color: #aaa;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-btn:hover,
+        .close-btn:focus {
+            color: black;
+            text-decoration: none;
+        }
+
+        #loadList {
+            list-style-type: none;
+            padding: 0;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+         #loadList li {
+            padding: 10px 15px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s ease;
+         }
+         #loadList li:last-child {
+             border-bottom: none;
+         }
+         #loadList li:hover {
+            background-color: #f1f1f1;
+         }
+         #loadList li button {
+             padding: 3px 8px;
+             font-size: 0.8em;
+             margin-left: 10px;
+         }
+
+         #searchInput {
+             width: calc(100% - 22px); /* Adjust for padding and border */
+             margin-bottom: 10px;
+         }
+
+        /* Print Preview & Final Print Styles */
+        #printPreviewArea, #printArea {
+            border: 1px dashed #ccc;
+            padding: 20px;
+            margin-top: 20px;
+            font-family: 'Times New Roman', Times, serif; /* Classic prescription font */
+            background-color: #fff;
+            color: #000;
+            width: 750px; /* Approx A5 or smaller pad size */
+            box-sizing: border-box;
+        }
+
+        #printPreviewArea {
+            display: none; /* Hidden until preview button clicked */
+        }
+
+        #printHeader, #printFooter {
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        #printHeader h1 { font-size: 1.8em; margin: 0; color: #0056b3; }
+        #printHeader h2 { font-size: 1.1em; margin: 2px 0; font-weight: normal; }
+        #printHeader p { margin: 2px 0; font-size: 0.9em; }
+
+        .logo {
+            font-size: 3em; /* Adjust size */
+            color: #dc3545; /* Heart color */
+            position: absolute;
+            top: 5px;
+            left: 20px;
+            line-height: 1;
+        }
+        /* Simple Stethoscope-Heart Logo using text/symbols */
+        .logo .stethoscope {
+             display: inline-block;
+             transform: rotate(-45deg); /* Simulate earpieces */
+             margin-right: -5px;
+             color: #6c757d; /* Stethoscope color */
+        }
+        .logo .heart {
+             display: inline-block;
+             color: #dc3545; /* Heart color */
+        }
+
+
+        #printPatientDetails { margin-bottom: 20px; border-top: 1px solid #eee; border-bottom: 1px solid #eee; padding: 10px 0;}
+        #printPatientDetails table { width: 100%; font-size: 0.95em;}
+        #printPatientDetails td { padding: 3px 5px; }
+        #printPatientDetails td:first-child { font-weight: bold; width: 80px; }
+
+        #printDiagnosis { margin-bottom: 20px; }
+        #printDiagnosis h3, #printRx h3 {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            color: #333;
+            border: none;
+            padding: 0;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        #printRx { margin-bottom: 30px; }
+        #printRx::before {
+             content: "Rx";
+             font-size: 3.5em;
+             font-weight: bold;
+             float: left;
+             margin-right: 15px;
+             line-height: 1;
+             color: #555;
+        }
+        #printRx table { width: calc(100% - 60px); margin-left: 60px; border: none; font-size: 1em; }
+        #printRx th, #printRx td { border: none; padding: 5px 0; vertical-align: top;}
+        #printRx th { text-align: left; font-weight: bold; }
+        #printRx .drug-name { font-weight: bold; }
+        #printRx .drug-instructions { padding-left: 10px; }
+
+
+        #printFooter {
+            border-top: 1px solid #0056b3;
+            padding-top: 10px;
+            font-size: 0.85em;
+            color: #555;
+        }
+        #printFooter p { margin: 3px 0; }
+
+        /* Print Media Query */
+        @media print {
+            body {
+                background-color: #fff;
+                padding: 0;
+                margin: 0;
+                font-family: 'Times New Roman', Times, serif;
+                 -webkit-print-color-adjust: exact !important; /* Chrome, Safari */
+                 color-adjust: exact !important; /* Firefox, Edge */
+            }
+            .container, .button-group, #settingsModal, #loadModal, #printPreviewArea, header, footer, nav, aside {
+                display: none !important; /* Hide non-printable elements */
+            }
+            #printArea {
+                display: block !important;
+                border: none;
+                padding: 1cm; /* Add margins for printing */
+                margin: 0;
+                box-shadow: none;
+                width: 100%; /* Use full page width */
+                max-width: 100%;
+                height: auto;
+                position: absolute;
+                left: 0;
+                top: 0;
+            }
+             #printHeader h1 { color: #0056b3 !important; }
+             #printFooter { color: #555 !important; }
+             .logo .stethoscope { color: #6c757d !important; }
+             .logo .heart { color: #dc3545 !important; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container" id="mainForm">
+        <h2>Digital Prescription Pad</h2>
+
+        <!-- Patient Details -->
+        <h3>Patient Information</h3>
+        <div class="form-row">
+            <div>
+                <label for="patientName">Name:</label>
+                <input type="text" id="patientName" name="patientName" required>
+            </div>
+            <div>
+                <label for="patientAge">Age:</label>
+                <input type="number" id="patientAge" name="patientAge" min="0">
+            </div>
+            <div>
+                 <label for="prescriptionDate">Date:</label>
+                 <input type="date" id="prescriptionDate" name="prescriptionDate" required>
+            </div>
+        </div>
+        <div>
+            <label for="patientAddress">Address:</label>
+            <textarea id="patientAddress" name="patientAddress" rows="2"></textarea>
+        </div>
+
+        <!-- Diagnosis -->
+        <h3>Diagnosis</h3>
+        <textarea id="diagnosis" name="diagnosis" rows="3"></textarea>
+
+        <!-- Prescription (Rx) -->
+        <h3>Rx (Prescription)</h3>
+        <div id="rxSection">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Drug Name</th>
+                        <th>Dosage</th>
+                        <th>Frequency</th>
+                        <th>Duration</th>
+                        <th>Instructions</th>
+                        <th class="action-col">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="rxTableBody">
+                    <!-- Rows will be added dynamically -->
+                </tbody>
+            </table>
+            <button type="button" class="btn-secondary" onclick="addRxRow()" style="margin-top: 10px; font-size: 0.9em; padding: 5px 10px;">+ Add Drug</button>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="button-group">
+            <button type="button" class="btn-success" onclick="savePrescription()">💾 Save Prescription</button>
+            <button type="button" class="btn-info" onclick="showPrintPreview()">📄 Preview</button>
+            <button type="button" class="btn-primary" onclick="printPrescription()">🖨️ Print</button>
+            <button type="button" class="btn-warning" onclick="clearForm()">🔄 Clear Form</button>
+            <button type="button" class="btn-secondary" onclick="openLoadModal()">📂 Load Prescription</button>
+            <button type="button" class="btn-secondary" onclick="openSettingsModal()">⚙️ Settings</button>
+        </div>
+    </div>
+
+    <!-- Print Preview Area (Hidden by default) -->
+    <div id="printPreviewArea">
+        <!-- Content will be generated here by JS -->
+    </div>
+
+    <!-- Area used specifically for printing (Hidden on screen) -->
+     <div id="printArea" style="display: none;">
+         <!-- Content will be generated here by JS before printing -->
+     </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeSettingsModal()">&times;</span>
+            <h2>⚙️ Clinic Settings</h2>
+            <h3>Header Information</h3>
+             <div>
+                <label for="docName">Doctor's Name:</label>
+                <input type="text" id="docName">
+             </div>
+             <div>
+                 <label for="docQualification">Qualification:</label>
+                 <input type="text" id="docQualification">
+             </div>
+             <div class="form-row">
+                 <div>
+                    <label for="docCertNumber">Certification No.:</label>
+                    <input type="text" id="docCertNumber">
+                 </div>
+                 <div>
+                    <label for="hospitalName">Hospital/Clinic Name:</label>
+                    <input type="text" id="hospitalName">
+                 </div>
+             </div>
+             <div>
+                <label for="docSlogan">Slogan/Tagline:</label>
+                <input type="text" id="docSlogan">
+             </div>
+
+             <h3>Footer Information</h3>
+             <div class="form-row">
+                 <div>
+                     <label for="docPhone">Phone:</label>
+                     <input type="tel" id="docPhone">
+                 </div>
+                 <div>
+                     <label for="docEmail">Email:</label>
+                     <input type="email" id="docEmail">
+                 </div>
+             </div>
+             <div>
+                 <label for="docAddress">Address:</label>
+                 <textarea id="docAddress" rows="2"></textarea>
+             </div>
+             <div>
+                 <label for="docWebsite">Website:</label>
+                 <input type="url" id="docWebsite">
+             </div>
+
+             <div class="button-group" style="justify-content: flex-end;">
+                 <button class="btn-primary" onclick="saveSettings()">Save Settings</button>
+                 <button class="btn-secondary" onclick="closeSettingsModal()">Cancel</button>
+             </div>
+        </div>
+    </div>
+
+    <!-- Load Prescription Modal -->
+     <div id="loadModal" class="modal">
+         <div class="modal-content">
+             <span class="close-btn" onclick="closeLoadModal()">&times;</span>
+             <h2>📂 Load Saved Prescription</h2>
+             <input type="text" id="searchInput" placeholder="Search by Patient Name or Date (YYYY-MM-DD)..." onkeyup="filterLoadList()">
+             <ul id="loadList">
+                 <!-- Saved prescriptions listed here -->
+             </ul>
+             <div class="button-group" style="justify-content: flex-end;">
+                 <button class="btn-secondary" onclick="closeLoadModal()">Close</button>
+             </div>
+         </div>
+     </div>
+
+
+    <script>
+        const DB_NAME = 'DoctorPadDB';
+        const DB_VERSION = 1;
+        const SETTINGS_STORE = 'settings';
+        const PRESCRIPTIONS_STORE = 'prescriptions';
+        let db;
+
+        // --- IndexedDB Initialization ---
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+                request.onupgradeneeded = (event) => {
+                    const dbInstance = event.target.result;
+                    if (!dbInstance.objectStoreNames.contains(SETTINGS_STORE)) {
+                        dbInstance.createObjectStore(SETTINGS_STORE, { keyPath: 'id' });
+                    }
+                    if (!dbInstance.objectStoreNames.contains(PRESCRIPTIONS_STORE)) {
+                        const store = dbInstance.createObjectStore(PRESCRIPTIONS_STORE, { keyPath: 'id', autoIncrement: true });
+                        store.createIndex('patientName', 'patientName', { unique: false });
+                        store.createIndex('date', 'date', { unique: false });
+                    }
+                };
+
+                request.onsuccess = (event) => {
+                    db = event.target.result;
+                    console.log('Database initialized successfully');
+                    resolve(db);
+                };
+
+                request.onerror = (event) => {
+                    console.error('Database error:', event.target.errorCode);
+                    reject(event.target.errorCode);
+                };
+            });
+        }
+
+        // --- Settings Management ---
+        const defaultSettings = {
+            id: 'clinicInfo',
+            docName: "Dr. Your Name",
+            docQualification: "MBBS, MD",
+            docCertNumber: "CERT12345",
+            hospitalName: "Your Clinic/Hospital Name",
+            docSlogan: "Dedicated to Your Health",
+            docPhone: "123-456-7890",
+            docEmail: "email@example.com",
+            docAddress: "123 Health St, Wellness City",
+            docWebsite: "http://yourwebsite.com"
+        };
+
+        function saveSettings() {
+            if (!db) { alert('Database not initialized.'); return; }
+
+            const settings = {
+                id: 'clinicInfo',
+                docName: document.getElementById('docName').value,
+                docQualification: document.getElementById('docQualification').value,
+                docCertNumber: document.getElementById('docCertNumber').value,
+                hospitalName: document.getElementById('hospitalName').value,
+                docSlogan: document.getElementById('docSlogan').value,
+                docPhone: document.getElementById('docPhone').value,
+                docEmail: document.getElementById('docEmail').value,
+                docAddress: document.getElementById('docAddress').value,
+                docWebsite: document.getElementById('docWebsite').value
+            };
+
+            const transaction = db.transaction([SETTINGS_STORE], 'readwrite');
+            const store = transaction.objectStore(SETTINGS_STORE);
+            const request = store.put(settings);
+
+            request.onsuccess = () => {
+                alert('Settings saved successfully!');
+                closeSettingsModal();
+                // Optionally update header/footer immediately if displayed on main form
+            };
+            request.onerror = (event) => {
+                console.error('Error saving settings:', event.target.error);
+                alert('Error saving settings.');
+            };
+        }
+
+        function loadSettings() {
+             return new Promise((resolve) => {
+                if (!db) {
+                    console.error('Database not initialized.');
+                    resolve(defaultSettings); // Resolve with defaults if DB fails
+                    return;
+                 }
+                const transaction = db.transaction([SETTINGS_STORE], 'readonly');
+                const store = transaction.objectStore(SETTINGS_STORE);
+                const request = store.get('clinicInfo');
+
+                request.onsuccess = (event) => {
+                    const settings = event.target.result;
+                    if (settings) {
+                        document.getElementById('docName').value = settings.docName || '';
+                        document.getElementById('docQualification').value = settings.docQualification || '';
+                        document.getElementById('docCertNumber').value = settings.docCertNumber || '';
+                        document.getElementById('hospitalName').value = settings.hospitalName || '';
+                        document.getElementById('docSlogan').value = settings.docSlogan || '';
+                        document.getElementById('docPhone').value = settings.docPhone || '';
+                        document.getElementById('docEmail').value = settings.docEmail || '';
+                        document.getElementById('docAddress').value = settings.docAddress || '';
+                        document.getElementById('docWebsite').value = settings.docWebsite || '';
+                        resolve(settings);
+                    } else {
+                        // No settings saved yet, use defaults and save them
+                        saveSettingsToDB(defaultSettings).then(() => resolve(defaultSettings));
+                        // Populate form with defaults
+                        document.getElementById('docName').value = defaultSettings.docName;
+                        document.getElementById('docQualification').value = defaultSettings.docQualification;
+                        document.getElementById('docCertNumber').value = defaultSettings.docCertNumber;
+                        document.getElementById('hospitalName').value = defaultSettings.hospitalName;
+                        document.getElementById('docSlogan').value = defaultSettings.docSlogan;
+                        document.getElementById('docPhone').value = defaultSettings.docPhone;
+                        document.getElementById('docEmail').value = defaultSettings.docEmail;
+                        document.getElementById('docAddress').value = defaultSettings.docAddress;
+                        document.getElementById('docWebsite').value = defaultSettings.docWebsite;
+                    }
+                };
+                request.onerror = (event) => {
+                    console.error('Error loading settings:', event.target.error);
+                    alert('Error loading settings. Using defaults.');
+                    resolve(defaultSettings); // Resolve with defaults on error
+                };
+             });
+        }
+
+         // Helper to save settings silently (used for initial default save)
+        function saveSettingsToDB(settings) {
+            return new Promise((resolve, reject) => {
+                if (!db) { reject('Database not initialized.'); return; }
+                 const transaction = db.transaction([SETTINGS_STORE], 'readwrite');
+                 const store = transaction.objectStore(SETTINGS_STORE);
+                 const request = store.put(settings);
+                 request.onsuccess = resolve;
+                 request.onerror = reject;
+            });
+        }
+
+
+        // --- Prescription Management ---
+        function addRxRow(drug = { name: '', dosage: '', frequency: '', duration: '', instructions: '' }) {
+            const tableBody = document.getElementById('rxTableBody');
+            const newRow = tableBody.insertRow();
+            newRow.innerHTML = `
+                <td><input type="text" placeholder="e.g., Paracetamol" value="${drug.name || ''}"></td>
+                <td><input type="text" placeholder="e.g., 500mg" value="${drug.dosage || ''}"></td>
+                <td><input type="text" placeholder="e.g., TDS (Thrice Daily)" value="${drug.frequency || ''}"></td>
+                <td><input type="text" placeholder="e.g., 5 days" value="${drug.duration || ''}"></td>
+                <td><input type="text" placeholder="e.g., After meals" value="${drug.instructions || ''}"></td>
+                <td class="action-col"><button type="button" class="btn-danger" style="font-size:0.8em; padding: 3px 6px;" onclick="removeRxRow(this)">X</button></td>
+            `;
+        }
+
+        function removeRxRow(button) {
+            const row = button.closest('tr');
+            row.remove();
+        }
+
+        function getRxData() {
+            const tableBody = document.getElementById('rxTableBody');
+            const rows = tableBody.querySelectorAll('tr');
+            const rxData = [];
+            rows.forEach(row => {
+                const inputs = row.querySelectorAll('input[type="text"]');
+                if (inputs[0].value.trim() !== '') { // Only add if drug name is present
+                    rxData.push({
+                        name: inputs[0].value.trim(),
+                        dosage: inputs[1].value.trim(),
+                        frequency: inputs[2].value.trim(),
+                        duration: inputs[3].value.trim(),
+                        instructions: inputs[4].value.trim()
+                    });
+                }
+            });
+            return rxData;
+        }
+
+        function savePrescription() {
+            if (!db) { alert('Database not initialized.'); return; }
+
+            const patientName = document.getElementById('patientName').value.trim();
+            if (!patientName) {
+                alert('Patient Name is required to save.');
+                return;
+            }
+            const prescriptionDate = document.getElementById('prescriptionDate').value;
+             if (!prescriptionDate) {
+                alert('Prescription Date is required to save.');
+                return;
+            }
+
+            const prescriptionData = {
+                patientName: patientName,
+                patientAge: document.getElementById('patientAge').value,
+                patientAddress: document.getElementById('patientAddress').value,
+                date: prescriptionDate,
+                diagnosis: document.getElementById('diagnosis').value,
+                rx: getRxData(),
+                timestamp: new Date().toISOString() // Add timestamp for sorting/reference
+            };
+
+            const transaction = db.transaction([PRESCRIPTIONS_STORE], 'readwrite');
+            const store = transaction.objectStore(PRESCRIPTIONS_STORE);
+            const request = store.add(prescriptionData);
+
+            request.onsuccess = (event) => {
+                alert(`Prescription for ${patientName} saved successfully! (ID: ${event.target.result})`);
+                clearForm(); // Optionally clear form after saving
+            };
+            request.onerror = (event) => {
+                console.error('Error saving prescription:', event.target.error);
+                alert('Error saving prescription.');
+            };
+        }
+
+        function loadPrescription(id) {
+             if (!db) { alert('Database not initialized.'); return; }
+             const transaction = db.transaction([PRESCRIPTIONS_STORE], 'readonly');
+             const store = transaction.objectStore(PRESCRIPTIONS_STORE);
+             const request = store.get(id);
+
+             request.onsuccess = (event) => {
+                 const data = event.target.result;
+                 if (data) {
+                     document.getElementById('patientName').value = data.patientName || '';
+                     document.getElementById('patientAge').value = data.patientAge || '';
+                     document.getElementById('patientAddress').value = data.patientAddress || '';
+                     document.getElementById('prescriptionDate').value = data.date || '';
+                     document.getElementById('diagnosis').value = data.diagnosis || '';
+
+                     // Clear existing Rx rows and add loaded ones
+                     document.getElementById('rxTableBody').innerHTML = '';
+                     if (data.rx && Array.isArray(data.rx)) {
+                         data.rx.forEach(drug => addRxRow(drug));
+                     } else {
+                         addRxRow(); // Add one empty row if none loaded
+                     }
+
+                     alert(`Loaded prescription for ${data.patientName}`);
+                     closeLoadModal();
+                 } else {
+                     alert('Prescription not found.');
+                 }
+             };
+             request.onerror = (event) => {
+                 console.error('Error loading prescription:', event.target.error);
+                 alert('Error loading prescription.');
+             };
+        }
+
+        function deletePrescription(id, listItem) {
+            if (!db) { alert('Database not initialized.'); return; }
+            if (!confirm(`Are you sure you want to delete prescription ID ${id}?`)) {
+                return;
+            }
+
+            const transaction = db.transaction([PRESCRIPTIONS_STORE], 'readwrite');
+            const store = transaction.objectStore(PRESCRIPTIONS_STORE);
+            const request = store.delete(id);
+
+            request.onsuccess = () => {
+                 alert(`Prescription ID ${id} deleted.`);
+                 listItem.remove(); // Remove from the list in the modal
+                 // Check if list is empty
+                 const list = document.getElementById('loadList');
+                 if (!list.hasChildNodes()) {
+                     list.innerHTML = '<li>No saved prescriptions found.</li>';
+                 }
+            };
+            request.onerror = (event) => {
+                 console.error('Error deleting prescription:', event.target.error);
+                 alert('Error deleting prescription.');
+            };
+        }
+
+
+        // --- UI and Printing ---
+        function clearForm() {
+            document.getElementById('patientName').value = '';
+            document.getElementById('patientAge').value = '';
+            document.getElementById('patientAddress').value = '';
+            document.getElementById('prescriptionDate').value = new Date().toISOString().split('T')[0]; // Set to today
+            document.getElementById('diagnosis').value = '';
+            document.getElementById('rxTableBody').innerHTML = '';
+            addRxRow(); // Add one blank row
+            document.getElementById('printPreviewArea').style.display = 'none'; // Hide preview
+            document.getElementById('printPreviewArea').innerHTML = '';
+        }
+
+        async function generatePrintContent(settings) {
+            const patientName = document.getElementById('patientName').value;
+            const patientAge = document.getElementById('patientAge').value;
+            const patientAddress = document.getElementById('patientAddress').value;
+            const prescriptionDate = document.getElementById('prescriptionDate').value ? new Date(document.getElementById('prescriptionDate').value).toLocaleDateString() : 'N/A';
+            const diagnosis = document.getElementById('diagnosis').value;
+            const rxData = getRxData();
+
+             // Basic validation
+             if (!patientName || !document.getElementById('prescriptionDate').value) {
+                 alert("Patient Name and Date are required for printing.");
+                 return null;
+             }
+
+            let rxHtml = '<table>';
+            if (rxData.length > 0) {
+                 rxData.forEach((drug, index) => {
+                     rxHtml += `
+                         <tr>
+                             <td style="width: 5%; vertical-align: top;">${index + 1}.</td>
+                             <td class="drug-name">${drug.name || 'N/A'}</td>
+                             <td class="drug-instructions">
+                                ${drug.dosage || ''}${drug.dosage && drug.frequency ? ', ' : ''}${drug.frequency || ''}
+                                ${ (drug.dosage || drug.frequency) && drug.duration ? ' - ' : ''}${drug.duration || ''}<br>
+                                ${drug.instructions || ''}
+                            </td>
+                         </tr>`;
+                 });
+            } else {
+                 rxHtml += '<tr><td colspan="3">No medication prescribed.</td></tr>';
+            }
+             rxHtml += '</table>';
+
+
+            const content = `
+                <div id="printHeader">
+                     <div class="logo">
+                        <span class="stethoscope">⚕</span><span class="heart">❤</span>
+                     </div>
+                    <h1>${settings.docName || 'Doctor Name'}</h1>
+                    <h2>${settings.docQualification || 'Qualifications'}</h2>
+                    ${settings.hospitalName ? `<h2>${settings.hospitalName}</h2>` : ''}
+                    ${settings.docCertNumber ? `<p>Reg./Cert. No.: ${settings.docCertNumber}</p>` : ''}
+                    ${settings.docSlogan ? `<p><em>${settings.docSlogan}</em></p>` : ''}
+                </div>
+
+                <div id="printPatientDetails">
+                     <table>
+                         <tr><td>Name:</td><td>${patientName}</td><td>Age:</td><td>${patientAge || 'N/A'}</td></tr>
+                         <tr><td>Address:</td><td colspan="3">${patientAddress || 'N/A'}</td></tr>
+                         <tr><td>Date:</td><td>${prescriptionDate}</td><td></td><td></td></tr>
+                     </table>
+                </div>
+
+                 ${diagnosis ? `<div id="printDiagnosis"><h3>Diagnosis:</h3><p>${diagnosis.replace(/\n/g, '<br>')}</p></div>` : ''}
+
+
+                <div id="printRx">
+                    ${rxHtml}
+                </div>
+
+                <div id="printFooter">
+                    ${settings.docAddress ? `<p>${settings.docAddress}</p>` : ''}
+                    <p>
+                        ${settings.docPhone ? `Phone: ${settings.docPhone}` : ''}
+                        ${settings.docPhone && settings.docEmail ? ' | ' : ''}
+                        ${settings.docEmail ? `Email: ${settings.docEmail}` : ''}
+                    </p>
+                    ${settings.docWebsite ? `<p>Website: ${settings.docWebsite}</p>` : ''}
+                    <p style="margin-top: 10px; font-style: italic; font-size: 0.9em;">This is a digitally generated prescription.</p>
+                </div>
+            `;
+            return content;
+        }
+
+        async function showPrintPreview() {
+            const settings = await loadSettings(); // Ensure latest settings are loaded
+            const content = await generatePrintContent(settings);
+            if (content) {
+                const previewArea = document.getElementById('printPreviewArea');
+                previewArea.innerHTML = content;
+                previewArea.style.display = 'block';
+                 // Scroll to preview
+                 previewArea.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        async function printPrescription() {
+            const settings = await loadSettings(); // Ensure latest settings are loaded
+            const content = await generatePrintContent(settings);
+             if (content) {
+                const printArea = document.getElementById('printArea');
+                printArea.innerHTML = content;
+                printArea.style.display = 'block'; // Make it visible for printing process
+                window.print();
+                printArea.style.display = 'none'; // Hide it again after printing
+             }
+        }
+
+        // --- Modal Controls ---
+        function openSettingsModal() {
+            loadSettings().then(() => { // Load settings into the modal form
+                 document.getElementById('settingsModal').style.display = 'block';
+            });
+        }
+        function closeSettingsModal() { document.getElementById('settingsModal').style.display = 'none'; }
+
+        function openLoadModal() {
+             if (!db) { alert('Database not initialized.'); return; }
+             const list = document.getElementById('loadList');
+             const searchInput = document.getElementById('searchInput');
+             list.innerHTML = '<li>Loading...</li>'; // Clear previous list
+             searchInput.value = ''; // Clear search
+
+             const transaction = db.transaction([PRESCRIPTIONS_STORE], 'readonly');
+             const store = transaction.objectStore(PRESCRIPTIONS_STORE);
+             const request = store.getAll(); // Consider using cursor for very large DBs
+
+             request.onsuccess = (event) => {
+                 const prescriptions = event.target.result.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)); // Sort newest first
+                 list.innerHTML = ''; // Clear 'Loading...'
+                 if (prescriptions.length === 0) {
+                     list.innerHTML = '<li>No saved prescriptions found.</li>';
+                 } else {
+                     prescriptions.forEach(p => {
+                         const listItem = document.createElement('li');
+                         const displayDate = p.date ? new Date(p.date).toLocaleDateString() : 'No Date';
+                         listItem.innerHTML = `
+                             <span>${p.patientName} - ${displayDate} (Saved: ${new Date(p.timestamp).toLocaleDateString()})</span>
+                             <div>
+                                 <button class="btn-danger btn-sm" onclick="event.stopPropagation(); deletePrescription(${p.id}, this.closest('li'))">Delete</button>
+                                 <button class="btn-primary btn-sm" onclick="loadPrescription(${p.id})">Load</button>
+                             </div>
+                         `;
+                         // Store data for filtering
+                         listItem.setAttribute('data-name', p.patientName.toLowerCase());
+                         listItem.setAttribute('data-date', p.date || '');
+                         list.appendChild(listItem);
+                     });
+                 }
+                 document.getElementById('loadModal').style.display = 'block';
+             };
+             request.onerror = (event) => {
+                console.error('Error fetching prescriptions:', event.target.error);
+                list.innerHTML = '<li>Error loading prescriptions.</li>';
+                document.getElementById('loadModal').style.display = 'block';
+             };
+        }
+         function closeLoadModal() { document.getElementById('loadModal').style.display = 'none'; }
+
+         function filterLoadList() {
+             const filter = document.getElementById('searchInput').value.toLowerCase();
+             const list = document.getElementById('loadList');
+             const items = list.getElementsByTagName('li');
+             let found = false;
+
+             for (let i = 0; i < items.length; i++) {
+                 const name = items[i].getAttribute('data-name');
+                 const date = items[i].getAttribute('data-date');
+                 if (name && date) { // Ensure attributes exist
+                    if (name.includes(filter) || date.includes(filter)) {
+                         items[i].style.display = "";
+                         found = true;
+                    } else {
+                         items[i].style.display = "none";
+                    }
+                 } else if (items[i].textContent.toLowerCase().includes('loading') || items[i].textContent.toLowerCase().includes('no saved')) {
+                     // Keep info messages visible or handle appropriately
+                      items[i].style.display = "";
+                      found = true; // Prevent showing "No results" if only this message is present
+                 }
+             }
+             // Optional: Show a "no results" message if filter yields nothing
+             // (Need to add/remove a specific li for this)
+         }
+
+        // --- Initialization ---
+        window.onload = async () => {
+            try {
+                await initDB();
+                await loadSettings(); // Load settings when page loads
+                clearForm(); // Set date to today and add first row
+                console.log("Doctor Pad Ready.");
+            } catch (error) {
+                console.error("Initialization failed:", error);
+                alert("Error initializing the application. Please check console for details.");
+            }
+        };
+
+        // Close modals if clicked outside content
+        window.onclick = function(event) {
+            const settingsModal = document.getElementById('settingsModal');
+            const loadModal = document.getElementById('loadModal');
+            if (event.target == settingsModal) {
+                closeSettingsModal();
+            }
+            if (event.target == loadModal) {
+                closeLoadModal();
+            }
+        }
+
+    </script>
+
+</body>
+</html>

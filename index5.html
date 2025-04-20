@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Prescription Pad System</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-container {
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .btn {
+            padding: 10px 15px;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .btn:hover {
+            background-color: #3367d6;
+        }
+        #recordsList {
+            margin-top: 20px;
+        }
+        .record-item {
+            padding: 10px;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .record-item:hover {
+            background-color: #f9f9f9;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        .tab.active {
+            border-bottom: 3px solid #4285f4;
+            font-weight: bold;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Print Layout Styles */
+        #prescriptionPreview {
+            width: 100%;
+            background-color: white;
+            padding: 20px;
+        }
+        .prescription-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 5px;
+            position: relative;
+        }
+        .header-logo {
+            width: 100px;
+        }
+        .header-details {
+            flex-grow: 1;
+            text-align: center;
+        }
+        .header-hospital {
+            text-align: right;
+        }
+        .doctor-name {
+            color: #4285f4;
+            font-size: 24px;
+            margin: 0;
+        }
+        .qualification {
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 16px;
+            margin: 5px 0;
+        }
+        .hospital-name {
+            color: #4285f4;
+            font-size: 20px;
+            margin: 0;
+        }
+        .hospital-slogan {
+            font-size: 12px;
+            text-transform: uppercase;
+            text-align: right;
+        }
+        .certification {
+            font-size: 12px;
+            color: #555;
+        }
+        .header-line {
+            height: 2px;
+            background-color: #4285f4;
+            margin-top: 10px;
+        }
+        .patient-info {
+            margin-bottom: 20px;
+            background-color: #f0f8ff;
+            padding: 15px;
+        }
+        .patient-field {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        .patient-field label {
+            width: 100px;
+            font-weight: normal;
+        }
+        .patient-field .value {
+            flex-grow: 1;
+            border-bottom: 1px solid #000;
+            padding-bottom: 3px;
+            min-height: 20px;
+        }
+        .patient-row {
+            display: flex;
+            justify-content: space-between;
+        }
+        .patient-half {
+            width: 48%;
+        }
+        .rx-section {
+            position: relative;
+            min-height: 300px;
+            padding: 20px 0;
+        }
+        .rx-symbol {
+            font-size: 48px;
+            color: #4285f4;
+            font-weight: bold;
+        }
+        .rx-content {
+            margin-left: 40px;
+            white-space: pre-wrap;
+        }
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            color: #4285f4;
+        }
+        .footer-left, .footer-center, .footer-right {
+            display: flex;
+            flex-direction: column;
+        }
+        .contact-icon {
+            width: 16px;
+            height: 16px;
+            margin-right: 5px;
+        }
+        .footer-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .footer-decoration {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 150px;
+            height: 150px;
+            border: 3px solid #4285f4;
+            border-bottom: none;
+            border-right: none;
+            border-radius: 100% 0 0 0;
+            opacity: 0.3;
+        }
+        
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #prescriptionPreview, #prescriptionPreview * {
+                visibility: visible;
+            }
+            #prescriptionPreview {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                padding: 15px;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Doctor Prescription Pad System</h1>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="newPrescription">New Prescription</div>
+            <div class="tab" data-tab="records">Past Records</div>
+            <div class="tab" data-tab="preview">Preview & Print</div>
+        </div>
+        
+        <div id="newPrescription" class="tab-content active">
+            <div class="form-container">
+                <h2>Patient Information</h2>
+                <div class="form-group">
+                    <label for="patientName">Patient Name:</label>
+                    <input type="text" id="patientName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="patientAddress">Address:</label>
+                    <input type="text" id="patientAddress">
+                </div>
+                
+                <div class="form-row" style="display: flex; gap: 20px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label for="patientAge">Age:</label>
+                        <input type="number" id="patientAge">
+                    </div>
+                    
+                    <div class="form-group" style="flex: 1;">
+                        <label for="consultDate">Date:</label>
+                        <input type="date" id="consultDate">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="diagnosis">Diagnosis:</label>
+                    <input type="text" id="diagnosis">
+                </div>
+                
+                <div class="form-group">
+                    <label for="prescription">Prescription (Rx):</label>
+                    <textarea id="prescription" placeholder="Enter prescription details here..."></textarea>
+                </div>
+                
+                <h2>Doctor Information</h2>
+                <div class="form-group">
+                    <label for="doctorName">Doctor Name:</label>
+                    <input type="text" id="doctorName" value="Dr. Doctor Name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="qualification">Qualification:</label>
+                    <input type="text" id="qualification" value="QUALIFICATION">
+                </div>
+                
+                <div class="form-group">
+                    <label for="certification">Certification Number:</label>
+                    <input type="text" id="certification" value="12548-20">
+                </div>
+                
+                <div class="form-group">
+                    <label for="hospitalName">Hospital Name:</label>
+                    <input type="text" id="hospitalName" value="HOSPITAL">
+                </div>
+                
+                <div class="form-group">
+                    <label for="slogan">Slogan:</label>
+                    <input type="text" id="slogan" value="SLOGAN HERE">
+                </div>
+                
+                <h2>Contact Information</h2>
+                <div class="form-group">
+                    <label for="phone1">Phone 1:</label>
+                    <input type="text" id="phone1" value="55 47 79 94 15">
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone2">Phone 2:</label>
+                    <input type="text" id="phone2" value="55 47 79 94 18">
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" value="email_here@email.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="address">Office Address:</label>
+                    <input type="text" id="address" value="Address Here Number 123">
+                </div>
+                
+                <div class="form-group">
+                    <label for="website">Website:</label>
+                    <input type="url" id="website" value="www.webpage.com">
+                </div>
+                
+                <button class="btn" id="saveButton">Save Prescription</button>
+                <button class="btn" id="clearButton">Clear Form</button>
+            </div>
+        </div>
+        
+        <div id="records" class="tab-content">
+            <h2>Past Records</h2>
+            <div class="form-group">
+                <label for="searchPatient">Search Patient:</label>
+                <input type="text" id="searchPatient" placeholder="Enter patient name to search">
+            </div>
+            <button class="btn" id="searchButton">Search</button>
+            <div id="recordsList"></div>
+        </div>
+        
+        <div id="preview" class="tab-content">
+            <h2>Preview Prescription</h2>
+            <div id="prescriptionPreview">
+                <div class="prescription-header">
+                    <div class="header-logo">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+                            <path d="M30,20 C20,20 20,40 20,50 C20,70 40,85 50,85 C60,85 80,70 80,50 C80,40 80,20 70,20" stroke="#4285f4" fill="none" stroke-width="4"/>
+                            <circle cx="50" cy="60" r="15" stroke="#4285f4" fill="none" stroke-width="4"/>
+                            <path d="M30,20 L30,40 M70,20 L70,40" stroke="#4285f4" fill="none" stroke-width="4"/>
+                        </svg>
+                    </div>
+                    <div class="header-details">
+                        <h1 class="doctor-name" id="previewDoctorName">Dr. Doctor Name</h1>
+                        <p class="qualification" id="previewQualification">QUALIFICATION</p>
+                        <p class="certification" id="previewCertification">Certification 12548-20</p>
+                    </div>
+                    <div class="header-hospital">
+                        <h2 class="hospital-name" id="previewHospitalName">HOSPITAL</h2>
+                        <p class="hospital-slogan" id="previewSlogan">SLOGAN HERE</p>
+                    </div>
+                </div>
+                
+                <div class="header-line"></div>
+                
+                <div class="patient-info">
+                    <div class="patient-field">
+                        <label>Patient Name:</label>
+                        <div class="value" id="previewPatientName"></div>
+                    </div>
+                    
+                    <div class="patient-field">
+                        <label>Address:</label>
+                        <div class="value" id="previewPatientAddress"></div>
+                    </div>
+                    
+                    <div class="patient-row">
+                        <div class="patient-field patient-half">
+                            <label>Age:</label>
+                            <div class="value" id="previewPatientAge"></div>
+                        </div>
+                        
+                        <div class="patient-field patient-half">
+                            <label>Date:</label>
+                            <div class="value" id="previewConsultDate"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="patient-field">
+                        <label>Diagnosis:</label>
+                        <div class="value" id="previewDiagnosis"></div>
+                    </div>
+                </div>
+                
+                <div class="rx-section">
+                    <div class="rx-symbol">Rx</div>
+                    <div class="rx-content" id="previewPrescription"></div>
+                </div>
+                
+                <div class="footer">
+                    <div class="footer-left">
+                        <div class="footer-item">
+                            <span class="material-icons contact-icon">📞</span>
+                            <span id="previewPhone1">55 47 79 94 15</span>
+                        </div>
+                        <div class="footer-item">
+                            <span class="material-icons contact-icon">📞</span>
+                            <span id="previewPhone2">55 47 79 94 18</span>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-center">
+                        <div class="footer-item">
+                            <span class="material-icons contact-icon">📍</span>
+                            <span id="previewAddress">Address Here Number 123</span>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-right">
+                        <div class="footer-item">
+                            <span class="material-icons contact-icon">✉️</span>
+                            <span id="previewEmail">email_here@email.com</span>
+                        </div>
+                        <div class="footer-item">
+                            <span class="material-icons contact-icon">🌐</span>
+                            <span id="previewWebsite">www.webpage.com</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="footer-decoration"></div>
+            </div>
+            
+            <div class="no-print" style="margin-top: 20px;">
+                <button class="btn" id="printButton">Print Prescription</button>
+                <button class="btn" id="backButton">Back to Form</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // LocalStorage setup for prescription data
+        const STORAGE_KEY = 'doctorPadPrescriptions';
+        
+        // Initialize storage if it doesn't exist
+        if (!localStorage.getItem(STORAGE_KEY)) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+        }
+        
+        // Tab switching functionality
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.getAttribute('data-tab');
+                
+                // Remove active class from all tabs and tab contents
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(tc => tc.classList.remove('active'));
+                
+                // Add active class to the clicked tab and corresponding content
+                tab.classList.add('active');
+                document.getElementById(tabId).classList.add('active');
+                
+                if (tabId === 'preview') {
+                    updatePreview();
+                } else if (tabId === 'records') {
+                    loadRecords();
+                }
+            });
+        });
+        
+        // Form handling
+        const saveButton = document.getElementById('saveButton');
+        const clearButton = document.getElementById('clearButton');
+        const printButton = document.getElementById('printButton');
+        const backButton = document.getElementById('backButton');
+        const searchButton = document.getElementById('searchButton');
+        
+        saveButton.addEventListener('click', savePrescription);
+        clearButton.addEventListener('click', clearForm);
+        printButton.addEventListener('click', printPrescription);
+        backButton.addEventListener('click', () => {
+            // Switch to the new prescription tab
+            tabs[0].click();
+        });
+        searchButton.addEventListener('click', searchRecords);
+        
+        // Set today's date as default
+        document.getElementById('consultDate').valueAsDate = new Date();
+        
+        // Load initial records
+        loadRecords();
+        
+        // Functions
+        function savePrescription() {
+            const patientName = document.getElementById('patientName').value;
+            if (!patientName) {
+                alert("Patient name is required");
+                return;
+            }
+            
+            const prescriptionData = {
+                id: Date.now(), // Use timestamp as unique ID
+                // Patient Information
+                patientName: patientName,
+                patientAddress: document.getElementById('patientAddress').value,
+                patientAge: document.getElementById('patientAge').value,
+                date: document.getElementById('consultDate').value,
+                diagnosis: document.getElementById('diagnosis').value,
+                prescription: document.getElementById('prescription').value,
+                
+                // Doctor Information
+                doctorName: document.getElementById('doctorName').value,
+                qualification: document.getElementById('qualification').value,
+                certification: document.getElementById('certification').value,
+                hospitalName: document.getElementById('hospitalName').value,
+                slogan: document.getElementById('slogan').value,
+                
+                // Contact Information
+                phone1: document.getElementById('phone1').value,
+                phone2: document.getElementById('phone2').value,
+                email: document.getElementById('email').value,
+                address: document.getElementById('address').value,
+                website: document.getElementById('website').value,
+                
+                // Metadata
+                createdAt: new Date().toISOString()
+            };
+            
+            try {
+                // Get current prescriptions
+                const prescriptions = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+                
+                // Add new prescription
+                prescriptions.push(prescriptionData);
+                
+                // Save back to localStorage
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(prescriptions));
+                
+                alert("Prescription saved successfully!");
+                // Go to the preview tab
+                tabs[2].click();
+            } catch (error) {
+                console.error("Error saving prescription:", error);
+                alert("Error saving prescription. Please try again.");
+            }
+        }
+        
+        function clearForm() {
+            // Clear only patient-specific fields
+            document.getElementById('patientName').value = '';
+            document.getElementById('patientAddress').value = '';
+            document.getElementById('patientAge').value = '';
+            document.getElementById('diagnosis').value = '';
+            document.getElementById('prescription').value = '';
+            document.getElementById('consultDate').valueAsDate = new Date();
+        }
+        
+        function updatePreview() {
+            // Patient Information
+            document.getElementById('previewPatientName').textContent = document.getElementById('patientName').value;
+            document.getElementById('previewPatientAddress').textContent = document.getElementById('patientAddress').value;
+            document.getElementById('previewPatientAge').textContent = document.getElementById('patientAge').value;
+            
+            const dateValue = document.getElementById('consultDate').value;
+            const formattedDate = dateValue ? new Date(dateValue).toLocaleDateString() : '';
+            document.getElementById('previewConsultDate').textContent = formattedDate;
+            
+            document.getElementById('previewDiagnosis').textContent = document.getElementById('diagnosis').value;
+            document.getElementById('previewPrescription').textContent = document.getElementById('prescription').value;
+            
+            // Doctor Information
+            document.getElementById('previewDoctorName').textContent = document.getElementById('doctorName').value;
+            document.getElementById('previewQualification').textContent = document.getElementById('qualification').value;
+            document.getElementById('previewCertification').textContent = 'Certification ' + document.getElementById('certification').value;
+            document.getElementById('previewHospitalName').textContent = document.getElementById('hospitalName').value;
+            document.getElementById('previewSlogan').textContent = document.getElementById('slogan').value;
+            
+            // Contact Information
+            document.getElementById('previewPhone1').textContent = document.getElementById('phone1').value;
+            document.getElementById('previewPhone2').textContent = document.getElementById('phone2').value;
+            document.getElementById('previewEmail').textContent = document.getElementById('email').value;
+            document.getElementById('previewAddress').textContent = document.getElementById('address').value;
+            document.getElementById('previewWebsite').textContent = document.getElementById('website').value;
+        }
+        
+        function printPrescription() {
+            window.print();
+        }
+        
+        function loadRecords() {
+            const recordsList = document.getElementById('recordsList');
+            recordsList.innerHTML = '';
+            
+            try {
+                const prescriptions = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+                
+                // Sort by date (newest first)
+                prescriptions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                
+                prescriptions.forEach(record => {
+                    const recordItem = document.createElement('div');
+                    recordItem.className = 'record-item';
+                    recordItem.innerHTML = `
+                        <strong>${record.patientName}</strong>
+                        <div>Date: ${new Date(record.date).toLocaleDateString()}</div>
+                        <div>Diagnosis: ${record.diagnosis}</div>
+                    `;
+                    
+                    recordItem.addEventListener('click', () => {
+                        loadRecordDetails(record);
+                    });
+                    
+                    recordsList.appendChild(recordItem);
+                });
+                
+                if (prescriptions.length === 0) {
+                    recordsList.innerHTML = '<p>No records found.</p>';
+                }
+            } catch (error) {
+                console.error("Error loading records:", error);
+                recordsList.innerHTML = '<p>Error loading records.</p>';
+            }
+        }
+        
+        function searchRecords() {
+            const searchQuery = document.getElementById('searchPatient').value.toLowerCase();
+            const recordsList = document.getElementById('recordsList');
+            recordsList.innerHTML = '';
+            
+            if (!searchQuery) {
+                loadRecords();
+                return;
+            }
+            
+            try {
+                const prescriptions = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+                const filteredRecords = prescriptions.filter(record => 
+                    record.patientName.toLowerCase().includes(searchQuery)
+                );
+                
+                // Sort by date (newest first)
+                filteredRecords.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                
+                filteredRecords.forEach(record => {
+                    const recordItem = document.createElement('div');
+                    recordItem.className = 'record-item';
+                    recordItem.innerHTML = `
+                        <strong>${record.patientName}</strong>
+                        <div>Date: ${new Date(record.date).toLocaleDateString()}</div>
+                        <div>Diagnosis: ${record.diagnosis}</div>
+                    `;
+                    
+                    recordItem.addEventListener('click', () => {
+                        loadRecordDetails(record);
+                    });
+                    
+                    recordsList.appendChild(recordItem);
+                });
+                
+                if (filteredRecords.length === 0) {
+                    recordsList.innerHTML = '<p>No matching records found.</p>';
+                }
+            } catch (error) {
+                console.error("Error searching records:", error);
+                recordsList.innerHTML = '<p>Error searching records.</p>';
+            }
+        }
+        
+        function loadRecordDetails(record) {
+            // Fill the form with record details
+            document.getElementById('patientName').value = record.patientName;
+            document.getElementById('patientAddress').value = record.patientAddress;
+            document.getElementById('patientAge').value = record.patientAge;
+            document.getElementById('consultDate').value = record.date;
+            document.getElementById('diagnosis').value = record.diagnosis;
+            document.getElementById('prescription').value = record.prescription;
+            
+            // Doctor info
+            document.getElementById('doctorName').value = record.doctorName;
+            document.getElementById('qualification').value = record.qualification;
+            document.getElementById('certification').value = record.certification;
+            document.getElementById('hospitalName').value = record.hospitalName;
+            document.getElementById('slogan').value = record.slogan;
+            
+            // Contact info
+            document.getElementById('phone1').value = record.phone1;
+            document.getElementById('phone2').value = record.phone2;
+            document.getElementById('email').value = record.email;
+            document.getElementById('address').value = record.address;
+            document.getElementById('website').value = record.website;
+            
+            // Switch to the form tab
+            tabs[0].click();
+        }
+    </script>
+</body>
+</html>

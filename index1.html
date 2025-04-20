@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Doctor Pad System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { 
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f5f6fa; 
+      margin: 0; 
+      padding: 0; 
+    }
+    .container {
+      max-width: 800px;
+      margin: 40px auto 40px auto;
+      padding: 32px 24px 16px 24px;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 4px 16px rgba(22,40,82,0.07);
+    }
+    .header {
+      text-align: left;
+      border-bottom: 2px solid #337ab7;
+      padding-bottom: 18px;
+      display: flex;
+      align-items: center;
+      margin-bottom: 24px;
+      position: relative;
+    }
+    .logo {
+      width: 72px;
+      height: 72px;
+      margin-right: 16px;
+      flex-shrink: 0;
+    }
+    .header-info {
+      flex: 1;
+    }
+    .doctor-name {
+      font-size: 1.7em;
+      font-weight: bold;
+      color: #222a35;
+    }
+    .doctor-details, .hospital-name {
+      font-size: 1.12em;
+      color: #3b3e47;
+    }
+    .slogan {
+      font-size: 1em;
+      font-style: italic;
+      color: #5691cd;
+      margin-top: 6px;
+    }
+    .rx-row {
+      display: flex;
+      align-items: center;
+      margin: 20px 0 12px 0;
+    }
+    .rx-symbol {
+      font-size: 2em;
+      font-family: 'Georgia', serif;
+      font-weight: bold;
+      color: #0e61a7;
+      margin-right: 12px;
+    }
+    .section-label {
+      font-weight: 600;
+      color: #2d5fa1;
+      margin-bottom: 4px;
+    }
+    .form-group {
+      margin-bottom: 14px;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .form-group label {
+      min-width: 90px;
+    }
+    .form-group input, .form-group textarea {
+      flex: 1;
+      padding: 7px 10px;
+      border: 1.2px solid #b8c6e7;
+      border-radius: 6px;
+      font-size: 1em;
+      background: #f9fbfc;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 68px;
+      max-height: 260px;
+    }
+    .actions {
+      text-align: right;
+      margin-top: 22px;
+    }
+    .actions button {
+      background: #0e61a7;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 22px;
+      font-size: 1.1em;
+      margin-left: 12px;
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+    .actions button:hover {
+      background: #085087;
+    }
+    .prescription-list {
+      margin: 38px 0 0 0;
+      background: #f2f7fb;
+      border-radius: 8px;
+      padding: 20px;
+    }
+    .prescription-item {
+      padding: 16px 0;
+      border-bottom: 1px solid #d2e5f7;
+    }
+    .prescription-item:last-child {
+      border-bottom: none;
+    }
+    .prescription-header {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 500;
+      font-size: 1.05em;
+    }
+    .prescription-body {
+      margin: 7px 0 0 0;
+      padding-left: 22px;
+      color: #374063;
+      font-size: 1em;
+    }
+    /* Print Styles */
+    @media print {
+      body, html { background: #fff !important; }
+      .container { box-shadow: none; margin: 0; padding: 0;}
+      .actions, #data-section, .prescription-list { display: none !important;}
+      #print-prescription { display: block !important;}
+    }
+    /* Print Prescription Layout */
+    #print-prescription {
+      display: none;
+      margin: 0;
+      padding: 0;
+      background: #fff;
+      color: #222;
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+    #print-prescription .header { 
+      border-bottom: 2px solid #337ab7; 
+      margin: 0;
+      padding-bottom: 12px;
+    }
+    #print-prescription .doctor-name { font-size: 1.45em;}
+    #print-prescription .hospital-name { font-size: 1.10em;}
+    #print-prescription .rx-symbol { font-size: 1.7em;}
+    #print-prescription .section, #print-prescription .section-label {margin-top:10px;}
+    #print-prescription .footer {
+      border-top: 2px solid #99c9ee;
+      margin-top: 36px;
+      padding-top: 18px;
+      color: #36597f;
+      font-size: 0.98em;
+    }
+    #print-prescription label {color:#3b3e47}
+  </style>
+</head>
+<body>
+  <div class="container" id="main-section">
+    <div class="header">
+      <div class="logo">
+        <!-- Stethoscope Heart SVG Logo -->
+        <svg viewBox="0 0 70 70" width="72" height="72">
+          <defs>
+            <linearGradient id="lg1" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0%" stop-color="#409fff"/>
+              <stop offset="100%" stop-color="#0e61a7"/>
+            </linearGradient>
+          </defs>
+          <path d="M26,20 
+                   Q18,10 7,20
+                   Q-4,32 20,55
+                   Q33,66 46,55
+                   Q70,32 59,20
+                   Q44,5 34,18"
+                fill="none" stroke="url(#lg1)" stroke-width="3"/>
+          <circle cx="34" cy="58" r="6" fill="url(#lg1)" stroke="#337ab7" stroke-width="2"/>
+          <path d="M34,24 Q37,40 34,58" fill="none" stroke="#b8c6e7" stroke-width="3" stroke-dasharray="4,6"/>
+        </svg>
+      </div>
+      <div class="header-info">
+        <div class="doctor-name" id="header-doctor-name">Dr. Ashfaq Ahmed</div>
+        <div class="doctor-details" id="header-doctor-qual">MBBS, FCPS (Medicine) &mdash; PMDC #12345</div>
+        <div class="hospital-name" id="header-hospital">Lifecare Hospital</div>
+        <div class="slogan" id="header-slogan">"Compassion and Care, Always There"</div>
+      </div>
+    </div>
+    <!-- Doctor Pad Form -->
+    <form id="rx-form" autocomplete="off">
+      <div class="section-label">Patient Information</div>
+      <div class="form-group">
+        <label for="pname">Name:</label>
+        <input type="text" id="pname" required maxlength="40" autocomplete="off">
+        <label for="page">Age:</label>
+        <input type="number" id="page" required min="0" max="120" style="max-width:70px;">
+      </div>
+      <div class="form-group">
+        <label for="paddress">Address:</label>
+        <input type="text" id="paddress" maxlength="80" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label for="date">Date:</label>
+        <input type="date" id="date" required>
+      </div>
+      <div class="section-label">Diagnosis</div>
+      <div class="form-group">
+        <textarea id="diagnosis" required placeholder="Enter diagnosis..."></textarea>
+      </div>
+      <div class="rx-row">
+        <span class="rx-symbol">&#8478;</span>
+        <div class="section-label" style="margin-bottom:0;">Prescription</div>
+      </div>
+      <div class="form-group">
+        <textarea id="prescription" required placeholder="Enter prescriptions, directions, etc..."></textarea>
+      </div>
+      <div class="actions">
+        <button type="button" onclick="savePrescription()">Save</button>
+        <button type="button" onclick="printPreview()">Print Preview</button>
+      </div>
+    </form>
+    <!-- Prescription List -->
+    <div id="data-section">
+      <h3>Saved Prescriptions</h3>
+      <div id="prescriptions-list" class="prescription-list"></div>
+    </div>
+  </div>
+  <!-- Print Preview Section -->
+  <div id="print-prescription"></div>
+  <!-- Footer -->
+  <div style="text-align:center; color:#4873ac; font-size:0.99em; margin-top:30px; padding:9px;">
+    Doctor Pad System &copy; 2025 &mdash; All Data Stored Securely On This Device
+  </div>
+  <!-- Contact Footer (for print) -->
+  <template id="footer-contacts">
+    <div class="footer">
+      <b>Phone:</b> 0312-5555555 &nbsp; | &nbsp;
+      <b>Email:</b> doctor@lifecare.com &nbsp; | &nbsp;
+      <b>Address:</b> Main Road, Karachi &nbsp; | &nbsp;
+      <b>Website:</b> www.lifecare.com
+    </div>
+  </template>
+  <script>
+    // IndexedDB Wrapper
+    let db;
+    function openDB() {
+      return new Promise((resolve, reject) => {
+        let request = window.indexedDB.open('DoctorPadDB', 1);
+        request.onerror = () => reject('IndexedDB error');
+        request.onsuccess = () => {
+          db = request.result;
+          resolve(db);
+        };
+        request.onupgradeneeded = (e) => {
+          let db = e.target.result;
+          if (!db.objectStoreNames.contains('prescriptions'))
+            db.createObjectStore('prescriptions', {keyPath: 'id', autoIncrement:true});
+        };
+      });
+    }
+    function addPrescription(data) {
+      return new Promise((resolve, reject) => {
+        let tx = db.transaction('prescriptions', 'readwrite');
+        let store = tx.objectStore('prescriptions');
+        let req = store.add(data);
+        req.onsuccess = () => resolve();
+        req.onerror = () => reject();
+      });
+    }
+    function getAllPrescriptions() {
+      return new Promise((resolve, reject) => {
+        let tx = db.transaction('prescriptions', 'readonly');
+        let store = tx.objectStore('prescriptions');
+        let req = store.getAll();
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject();
+      });
+    }
+    function deletePrescription(id) {
+      return new Promise((resolve, reject) => {
+        let tx = db.transaction('prescriptions', 'readwrite');
+        let store = tx.objectStore('prescriptions');
+        let req = store.delete(id);
+        req.onsuccess = () => resolve();
+        req.onerror = () => reject();
+      });
+    }
+    // Utility
+    function escapeHTML(str) {
+      return str.replace(/[&<>"']/g, (c) => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+      }[c]));
+    }
+    // Initial Setup
+    (async function init() {
+      await openDB();
+      refreshList();
+      document.getElementById('date').valueAsDate = new Date();
+    })();
+
+    // Save Prescription
+    async function savePrescription() {
+      let pname = document.getElementById('pname').value.trim();
+      let page = document.getElementById('page').value.trim();
+      let paddress = document.getElementById('paddress').value.trim();
+      let date = document.getElementById('date').value;
+      let diagnosis = document.getElementById('diagnosis').value.trim();
+      let prescription = document.getElementById('prescription').value.trim();
+      if(!pname || !page || !date || !diagnosis || !prescription) {
+        alert('Please fill all required fields.');
+        return;
+      }
+      let data = {
+        pname, page, paddress, date, diagnosis, prescription,
+        doctorHeader: getHeaderData()
+      };
+      await addPrescription(data);
+      document.getElementById('rx-form').reset();
+      document.getElementById('date').valueAsDate = new Date();
+      refreshList();
+      alert('Prescription saved!');
+    }
+    // List All Saved
+    async function refreshList() {
+      let list = await getAllPrescriptions();
+      let section = document.getElementById('prescriptions-list');
+      if(!list.length) {
+        section.innerHTML = '<i><span style="color:#6c8bb7;">No records found.</span></i>';
+        return;
+      }
+      section.innerHTML = '';
+      list.slice().reverse().forEach(data => {
+        let d = document.createElement('div');
+        d.className = 'prescription-item';
+        d.innerHTML = `
+          <div class="prescription-header">
+            <span><b>${escapeHTML(data.pname)}</b> (${escapeHTML(data.page)}y) - ${escapeHTML(data.date)} </span>
+            <span>
+              <button onclick="viewPrint(${data.id});event.stopPropagation();" style="color:#fff;background:#0e61a7;padding:2px 7px;border:none;border-radius:3px;margin-right:7px;">Print</button>
+              <button onclick="delRec(${data.id});event.stopPropagation();" style="color:#fff;background:#c23e3e;padding:2px 7px;border:none;border-radius:3px;">Delete</button>
+            </span>
+          </div>
+          <div class="prescription-body">
+            <span style="color:#289; font-weight:bold;">Diagnosis: </span> ${escapeHTML(data.diagnosis)}<br>
+            <span style="color:#0e61a7; font-family:Georgia; font-weight:bold; font-size:1.1em;">&#8478;</span>
+            <span style="color:#193257;">${escapeHTML(data.prescription)}</span>
+          </div>
+        `;
+        section.appendChild(d);
+      });
+    }
+
+    // Delete Record
+    async function delRec(id) {
+      if(!confirm('Delete this prescription permanently?')) return;
+      await deletePrescription(id);
+      refreshList();
+    }
+
+    // Print Preview of Current Form
+    function printPreview() {
+      let data = {};
+      let el = (id) => document.getElementById(id);
+      data.pname = el('pname').value.trim();
+      data.page = el('page').value.trim();
+      data.paddress = el('paddress').value.trim();
+      data.date = el('date').value;
+      data.diagnosis = el('diagnosis').value.trim();
+      data.prescription = el('prescription').value.trim();
+      data.doctorHeader = getHeaderData();
+      if(!data.pname || !data.page || !data.date || !data.diagnosis || !data.prescription) {
+        alert('Please fill all required fields.');
+        return;
+      }
+      showPrintView(data);
+    }
+    // View/Print Past Record
+    function viewPrint(id) {
+      getAllPrescriptions().then(list => {
+        let data = list.find(x => x.id == id);
+        if(data) showPrintView(data);
+      });
+    }
+
+    // Show Print View
+    function showPrintView(data) {
+      // Use template literals and ensure HTML escaping!
+      let html = `
+      <div style="max-width:760px; margin:auto; padding:32px 24px 12px 24px; background:#fff;">
+        <div class="header">
+          <div class="logo">
+            <svg viewBox="0 0 70 70" width="72" height="72">
+              <defs>
+                <linearGradient id="lg2" x1="0" x2="1" y1="0" y2="1">
+                  <stop offset="0%" stop-color="#409fff"/>
+                  <stop offset="100%" stop-color="#0e61a7"/>
+                </linearGradient>
+              </defs>
+              <path d="M26,20 Q18,10 7,20 Q-4,32 20,55 Q33,66 46,55 Q70,32 59,20 Q44,5 34,18"
+                 fill="none" stroke="url(#lg2)" stroke-width="3"/>
+              <circle cx="34" cy="58" r="6" fill="url(#lg2)" stroke="#337ab7" stroke-width="2"/>
+              <path d="M34,24 Q37,40 34,58" fill="none" stroke="#b8c6e7" stroke-width="3" stroke-dasharray="4,6"/>
+            </svg>
+          </div>
+          <div class="header-info">
+            <div class="doctor-name">${escapeHTML(data.doctorHeader.name)}</div>
+            <div class="doctor-details">${escapeHTML(data.doctorHeader.qual)} &mdash; ${escapeHTML(data.doctorHeader.cert)}</div>
+            <div class="hospital-name">${escapeHTML(data.doctorHeader.hospital)}</div>
+            <div class="slogan">${escapeHTML(data.doctorHeader.slogan)}</div>
+          </div>
+        </div>
+        <div class="section" style="margin-top:14px;">
+          <table style="width:100%;font-size:1em;">
+            <tr>
+              <td><b>Patient Name:</b> ${escapeHTML(data.pname)}</td>
+              <td><b>Age:</b> ${escapeHTML(data.page)}</td>
+              <td><b>Date:</b> ${escapeHTML(data.date)}</td>
+            </tr>
+            <tr>
+              <td colspan="2"><b>Address:</b> ${escapeHTML(data.paddress)}</td>
+              <td></td>
+            </tr>
+          </table>
+        </div>
+        <div class="section-label" style="margin-top:12px;">Diagnosis</div>
+        <div style="padding-left:10px;font-size:1.05em;">${escapeHTML(data.diagnosis)}</div>
+        <div class="rx-row" style="margin-top:20px;">
+          <span class="rx-symbol">&#8478;</span>
+          <div class="section-label" style="margin-bottom:0;">Prescription</div>
+        </div>
+        <div style="padding-left:26px; min-height:68px; font-size:1.12em; color:#143967;">
+          ${escapeHTML(data.prescription).replace(/\n/g, '<br>')}
+        </div>
+        ${document.getElementById('footer-contacts').innerHTML}
+      </div>`;
+      document.getElementById('print-prescription').innerHTML = html;
+      document.getElementById('main-section').style.display = 'none';
+      document.getElementById('print-prescription').style.display = 'block';
+      setTimeout(()=>window.print(),300);
+      setTimeout(()=>{
+        document.getElementById('main-section').style.display = '';
+        document.getElementById('print-prescription').style.display = 'none';
+      },800); // return on print dialog close
+    }
+
+    // Doctor Header - Customization
+    function getHeaderData() {
+      // You can make these fields user-editable/more dynamic as needed!
+      return {
+        name: document.getElementById('header-doctor-name').textContent,
+        qual: document.getElementById('header-doctor-qual').textContent.split(' — ')[0],
+        cert: document.getElementById('header-doctor-qual').textContent.split(' — ')[1] || '',
+        hospital: document.getElementById('header-hospital').textContent,
+        slogan: document.getElementById('header-slogan').textContent
+      };
+    }
+    // Example: To allow editing header, just replace .textContent with .value from an input field.
+  </script>
+</body>
+</html>

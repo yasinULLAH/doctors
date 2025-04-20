@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Doctor Pad Prescription System</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Roboto+Slab&display=swap');
+  :root {
+    --primary-color: #2e6da4;
+    --accent-color: #d9534f;
+    --bg-color: #fff;
+    --text-color: #222;
+    --border-color: #bbb;
+  }
+  * {
+    box-sizing: border-box;
+    font-family: 'Roboto Slab', serif;
+  }
+  body {
+    margin: 0;
+    padding: 0;
+    background: #f9fafd;
+    color: var(--text-color);
+  }
+  header, footer {
+    background: var(--primary-color);
+    color: #fff;
+    padding: 1em 1.5em;
+    text-align: center;
+  }
+  header h1 {
+    margin: 0;
+    font-weight: 700;
+    font-size: 1.8em;
+    letter-spacing: 1px;
+  }
+  header .subheader {
+    font-weight: 400;
+    font-size: 1em;
+    margin: 0.2em 0 0.8em 0;
+  }
+  header .info-row {
+    font-size: 0.9em;
+    letter-spacing: 0.8px;
+  }
+  main {
+    max-width: 820px;
+    margin: 1.5em auto 4em;
+    background: var(--bg-color);
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgb(0 0 0 / 0.12);
+    padding: 1.5em 2em 2.5em;
+  }
+  form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 1.5em;
+    row-gap: 1.3em;
+  }
+  form label {
+    display: block;
+    margin-bottom: 0.3em;
+    font-weight: 600;
+  }
+  form input[type="text"],
+  form input[type="email"],
+  form input[type="number"],
+  form input[type="date"],
+  form textarea {
+    width: 100%;
+    font-family: 'Roboto Slab', serif;
+    font-size: 1em;
+    padding: 0.4em 0.6em;
+    border: 1.6px solid var(--border-color);
+    border-radius: 4px;
+    transition: border-color 0.25s ease;
+  }
+  form input[type="text"]:focus,
+  form input[type="email"]:focus,
+  form input[type="number"]:focus,
+  form input[type="date"]:focus,
+  form textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 3px var(--primary-color);
+  }
+  form textarea {
+    resize: vertical;
+    min-height: 80px;
+    font-size: 1.05em;
+  }
+  .full-width {
+    grid-column: 1 / -1;
+  }
+  .section-title {
+    font-size: 1.3em;
+    margin: 0.6em 0 0.8em 0;
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 0.25em;
+    color: var(--primary-color);
+    font-weight: 700;
+  }
+  .btn-row {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1em;
+    margin-top: 1.2em;
+  }
+  button {
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 1em;
+    padding: 0.5em 1.3em;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 3px 5px rgb(0 0 0 / 0.15);
+  }
+  button.primary {
+    background-color: var(--primary-color);
+    color: white;
+  }
+  button.primary:hover {
+    background-color: #255a8c;
+  }
+  button.secondary {
+    background-color: var(--accent-color);
+    color: white;
+  }
+  button.secondary:hover {
+    background-color: #b23c36;
+  }
+  #message {
+    grid-column: 1 / -1;
+    color: var(--accent-color);
+    font-weight: 700;
+    text-align: center;
+    margin-top: 1em;
+  }
+
+  /* Print Styles */
+  #printArea {
+    display: none;
+  }
+  @media print {
+    body * {
+      visibility: hidden;
+    }
+    #printArea, #printArea * {
+      visibility: visible;
+    }
+    #printArea {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      max-width: 800px;
+      padding: 1.2em 2em;
+      font-family: 'Roboto Slab', serif;
+      font-size: 13pt;
+      color: #222;
+      background: white;
+      box-sizing: border-box;
+      line-height: 1.5;
+    }
+    #printArea header, #printArea footer {
+      background: none;
+      color: #222;
+      text-align: center;
+      padding: 0;
+      margin-bottom: 0.3em;
+      border-bottom: 1.8px solid var(--primary-color);
+    }
+    #printArea header h1 {
+      font-size: 20pt;
+      margin-bottom: 0;
+      letter-spacing: 1px;
+      font-weight: 700;
+    }
+    #printArea header .subheader {
+      font-size: 11pt;
+      margin-top: 0.1em;
+      margin-bottom: 0.6em;
+      font-weight: 500;
+      font-style: italic;
+      color: #555;
+    }
+    #printArea .logo {
+      max-width: 48px;
+      margin-bottom: 0.6em;
+    }
+    #printArea .info-row {
+      font-size: 9pt;
+      margin-top: 0.1em;
+      margin-bottom: 0.9em;
+      letter-spacing: 0.5px;
+      font-weight: 400;
+    }
+    #printArea main {
+      margin-top: 1em;
+    }
+    #printArea .section-title {
+      font-weight: 700;
+      font-size: 14pt;
+      margin-bottom: 0.2em;
+      color: var(--primary-color);
+      border: none;
+      padding: 0;
+    }
+    #printArea .field-label {
+      font-weight: 600;
+      color: var(--accent-color);
+      display: inline-block;
+      width: 130px;
+      vertical-align: top;
+    }
+    #printArea .field-value {
+      display: inline-block;
+      width: calc(100% - 140px);
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    #printArea footer {
+      border-top: 1.8px solid var(--primary-color);
+      margin-top: 2.2em;
+      font-size: 10pt;
+      color: #666;
+    }
+    #printArea footer .contact-info span {
+      display: inline-block;
+      margin: 0 0.9em;
+    }
+  }
+
+  /* Logo SVG styling */
+  .logo-svg {
+    fill: var(--primary-color);
+    stroke: var(--accent-color);
+    stroke-width: 0.8;
+  }
+</style>
+</head>
+<body>
+
+<header aria-label="Doctor prescription form header">
+  <div class="logo" role="img" aria-label="Stethoscope and heart logo" style="margin-bottom:0.6em;">
+    <svg viewBox="0 0 64 64" width="48" height="48" class="logo-svg" aria-hidden="true" focusable="false">
+      <path d="M43.5 5c-6 0-10 4-11 9-1-5-5-9-11-9-7.5 0-10 9-6 14s15 14 17 16c2-2.3 12-10 17-16s1.5-14-6-14z"/>
+      <circle cx="22" cy="44" r="8" fill="none" stroke-width="3"/>
+      <line x1="22" y1="52" x2="22" y2="62" stroke-width="3"/>
+      <line x1="15" y1="62" x2="29" y2="62" stroke-width="3"/>
+    </svg>
+  </div>
+  <h1 id="doctorNameHeader">Dr. John Doe, MBBS, MD</h1>
+  <p class="subheader" id="doctorQualificationHeader">Certified General Physician</p>
+  <p class="info-row" id="certificationNoHeader">Cert. No: ABC1234567</p>
+  <p class="info-row" id="hospitalNameHeader"><strong>City Hospital</strong></p>
+  <p class="info-row" id="doctorSloganHeader">"Caring for your health with compassion"</p>
+</header>
+
+<main>
+  <form id="prescriptionForm" autocomplete="off" aria-label="Prescription input form">
+    <h2 class="section-title">Patient Details</h2>
+    <label for="patientName">Name <sup>*</sup></label>
+    <input type="text" id="patientName" name="patientName" required aria-required="true" autocomplete="name" spellcheck="false" />
+    
+    <label for="patientAddress">Address</label>
+    <input type="text" id="patientAddress" name="patientAddress" spellcheck="false" autocomplete="street-address" />
+
+    <label for="patientAge">Age</label>
+    <input type="number" id="patientAge" name="patientAge" min="0" max="150" pattern="\d*" inputmode="numeric" />
+
+    <label for="prescriptionDate">Date</label>
+    <input type="date" id="prescriptionDate" name="prescriptionDate" />
+
+    <h2 class="section-title full-width">Diagnosis</h2>
+    <textarea id="diagnosis" name="diagnosis" rows="3" class="full-width" placeholder="Enter diagnosis or observations here..."></textarea>
+
+    <h2 class="section-title full-width">Prescription (Rx)</h2>
+    <textarea id="prescriptionRx" name="prescriptionRx" rows="5" class="full-width" placeholder="Enter medicines, dosage, instructions..." required aria-required="true"></textarea>
+
+    <h2 class="section-title full-width">Doctor Header Customization</h2>
+    <label for="doctorName">Doctor Name</label>
+    <input type="text" id="doctorName" name="doctorName" placeholder="Dr. John Doe" />
+    
+    <label for="doctorQualification">Qualification</label>
+    <input type="text" id="doctorQualification" name="doctorQualification" placeholder="MBBS, MD" />
+    
+    <label for="certificationNo">Certification Number</label>
+    <input type="text" id="certificationNo" name="certificationNo" placeholder="ABC1234567" />
+    
+    <label for="hospitalName">Hospital Name</label>
+    <input type="text" id="hospitalName" name="hospitalName" placeholder="City Hospital" />
+
+    <label for="doctorSlogan">Slogan</label>
+    <input type="text" id="doctorSlogan" name="doctorSlogan" placeholder="Caring for your health with compassion" />
+
+    <h2 class="section-title full-width">Contact Details (Footer)</h2>
+    <label for="contactPhone">Phone</label>
+    <input type="text" id="contactPhone" name="contactPhone" placeholder="+1-234-567-890" />
+
+    <label for="contactEmail">Email</label>
+    <input type="email" id="contactEmail" name="contactEmail" placeholder="doctor@example.com" />
+
+    <label for="contactAddress">Address</label>
+    <input type="text" id="contactAddress" name="contactAddress" placeholder="123 Medical St, City" />
+
+    <label for="contactWebsite">Website</label>
+    <input type="text" id="contactWebsite" name="contactWebsite" placeholder="www.cityhospital.com" />
+
+    <div class="btn-row">
+      <button type="button" id="saveBtn" class="primary" aria-label="Save prescription">Save</button>
+      <button type="button" id="loadBtn" class="secondary" aria-label="Load saved prescriptions">Load</button>
+      <button type="button" id="previewBtn" class="primary" aria-label="Preview prescription for printing">Print Preview</button>
+      <button type="reset" aria-label="Clear form">Clear</button>
+    </div>
+    <div id="message" role="alert" aria-live="polite"></div>
+  </form>
+</main>
+
+<!-- Print Preview Modal -->
+<div id="previewModal" role="dialog" aria-modal="true" aria-labelledby="previewTitle" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#fff;width:90vw;max-width:820px;max-height:90vh;overflow-y:auto;box-shadow: 0 5px 15px rgba(0,0,0,0.3);border-radius:6px;position:relative;padding:1em 2em;">
+    <h2 id="previewTitle" style="text-align:center;margin-bottom:0.8em;color: var(--primary-color);">Prescription Print Preview</h2>
+    <div id="printArea" tabindex="0" role="document" aria-label="Printable prescription document">
+      <!-- Content injected by JS -->
+    </div>
+    <div style="text-align:center; margin-top:1em;">
+      <button id="printNowBtn" class="primary" aria-label="Print now">Print</button>
+      <button id="closePreviewBtn" class="secondary" aria-label="Close preview">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  // IndexedDB Setup
+  let db;
+  const dbName = 'DoctorPadDB';
+  const storeName = 'prescriptions';
+
+  function openDB() {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open(dbName, 1);
+      request.onerror = () => reject('DB open failed');
+      request.onsuccess = () => {
+        db = request.result;
+        resolve(db);
+      };
+      request.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains(storeName)) {
+          const store = db.createObjectStore(storeName, { keyPath: 'id', autoIncrement: true });
+          store.createIndex('patientName', 'patientName', { unique: false });
+          store.createIndex('date', 'date', { unique: false });
+        }
+      };
+    });
+  }
+
+  // DOM Elements
+  const form = document.getElementById('prescriptionForm');
+  const message = document.getElementById('message');
+  const printArea = document.getElementById('printArea');
+  const previewModal = document.getElementById('previewModal');
+  const printNowBtn = document.getElementById('printNowBtn');
+  const closePreviewBtn = document.getElementById('closePreviewBtn');
+  const saveBtn = document.getElementById('saveBtn');
+  const loadBtn = document.getElementById('loadBtn');
+  const previewBtn = document.getElementById('previewBtn');
+
+  // Header fields to update live on the header
+  const doctorNameHeader = document.getElementById('doctorNameHeader');
+  const doctorQualificationHeader = document.getElementById('doctorQualificationHeader');
+  const certificationNoHeader = document.getElementById('certificationNoHeader');
+  const hospitalNameHeader = document.getElementById('hospitalNameHeader');
+  const doctorSloganHeader = document.getElementById('doctorSloganHeader');
+
+  // Sync header inputs with header display
+  function syncHeader() {
+    doctorNameHeader.textContent = form.doctorName.value.trim() || 'Dr. John Doe, MBBS, MD';
+    doctorQualificationHeader.textContent = form.doctorQualification.value.trim() || 'Certified General Physician';
+    certificationNoHeader.textContent = form.certificationNo.value.trim() ? ('Cert. No: ' + form.certificationNo.value.trim()) : 'Cert. No: ABC1234567';
+    hospitalNameHeader.innerHTML = form.hospitalName.value.trim() ? `<strong>${form.hospitalName.value.trim()}</strong>` : '<strong>City Hospital</strong>';
+    doctorSloganHeader.textContent = form.doctorSlogan.value.trim() || '"Caring for your health with compassion"';
+  }
+
+  [
+    form.doctorName,
+    form.doctorQualification,
+    form.certificationNo,
+    form.hospitalName,
+    form.doctorSlogan
+  ].forEach(el => el.addEventListener('input', syncHeader));
+
+  syncHeader();
+
+  // Utils for sanitizing user input (basic)
+  function sanitize(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  // Validation helper for prescription required fields
+  function validateForm() {
+    if (!form.patientName.value.trim()) return 'Patient name is required.';
+    if (!form.prescriptionRx.value.trim()) return 'Prescription (Rx) is required.';
+    return null;
+  }
+
+  // Compose print HTML content, matching specification
+  function generatePrintHTML(data) {
+    const {
+      patientName, patientAddress, patientAge, prescriptionDate,
+      diagnosis, prescriptionRx,
+      doctorName, doctorQualification, certificationNo, hospitalName, doctorSlogan,
+      contactPhone, contactEmail, contactAddress, contactWebsite
+    } = data;
+
+    // Date formatting (YYYY-MM-DD to readable)
+    const dateFormatted = prescriptionDate ? new Date(prescriptionDate).toLocaleDateString(undefined, { day:'2-digit', month:'short', year:'numeric' }) : '';
+
+    // Escape all inputs for HTML safety
+    const esc = sanitize;
+
+    return `
+<header>
+  <div style="margin-bottom:0.4em; text-align:center;">
+    <svg viewBox="0 0 64 64" width="42" height="42" class="logo-svg" aria-hidden="true" focusable="false" style="margin: 0 auto; display:block;">
+      <path d="M43.5 5c-6 0-10 4-11 9-1-5-5-9-11-9-7.5 0-10 9-6 14s15 14 17 16c2-2.3 12-10 17-16s1.5-14-6-14z"/>
+      <circle cx="22" cy="44" r="8" fill="none" stroke-width="3"/>
+      <line x1="22" y1="52" x2="22" y2="62" stroke-width="3"/>
+      <line x1="15" y1="62" x2="29" y2="62" stroke-width="3"/>
+    </svg>
+  </div>
+  <h1>${esc(doctorName || 'Dr. John Doe, MBBS, MD')}</h1>
+  <p class="subheader">${esc(doctorQualification || 'Certified General Physician')}</p>
+  <p class="info-row">${certificationNo ? 'Cert. No: ' + esc(certificationNo) : 'Cert. No: ABC1234567'}</p>
+  <p class="info-row"><strong>${esc(hospitalName || 'City Hospital')}</strong></p>
+  <p class="info-row">${esc(doctorSlogan || '"Caring for your health with compassion"')}</p>
+</header>
+<main>
+  <div>
+    <div><span class="field-label">Patient Name:</span><span class="field-value">${esc(patientName)}</span></div>
+    <div><span class="field-label">Address:</span><span class="field-value">${esc(patientAddress || '')}</span></div>
+    <div><span class="field-label">Age:</span><span class="field-value">${patientAge !== undefined && patientAge !== null && patientAge !== '' ? esc(patientAge) : ''}</span></div>
+    <div><span class="field-label">Date:</span><span class="field-value">${dateFormatted}</span></div>
+  </div>
+  <h3 class="section-title">Diagnosis</h3>
+  <div style="white-space: pre-wrap; margin-bottom: 1em;">${esc(diagnosis || '')}</div>
+  <h3 class="section-title">Prescription (Rx)</h3>
+  <div style="white-space: pre-wrap; font-weight:700; font-size:1.15em; color: var(--accent-color);">${esc(prescriptionRx)}</div>
+</main>
+<footer>
+  <div class="contact-info" style="font-size: 10pt; color: #555;">
+    ${contactPhone ? `<span>📞 ${esc(contactPhone)}</span>` : ''}
+    ${contactEmail ? `<span>✉️ ${esc(contactEmail)}</span>` : ''}
+    ${contactAddress ? `<span>📍 ${esc(contactAddress)}</span>` : ''}
+    ${contactWebsite ? `<span>🌐 ${esc(contactWebsite)}</span>` : ''}
+  </div>
+</footer>`;
+  }
+
+  // Save prescription data to IndexedDB
+  async function savePrescription() {
+    message.textContent = '';
+    const err = validateForm();
+    if (err) {
+      message.textContent = err;
+      message.style.color = 'var(--accent-color)';
+      return;
+    }
+
+    const data = {
+      patientName: form.patientName.value.trim(),
+      patientAddress: form.patientAddress.value.trim(),
+      patientAge: form.patientAge.value.trim(),
+      prescriptionDate: form.prescriptionDate.value || new Date().toISOString().slice(0, 10),
+      diagnosis: form.diagnosis.value.trim(),
+      prescriptionRx: form.prescriptionRx.value.trim(),
+      doctorName: form.doctorName.value.trim(),
+      doctorQualification: form.doctorQualification.value.trim(),
+      certificationNo: form.certificationNo.value.trim(),
+      hospitalName: form.hospitalName.value.trim(),
+      doctorSlogan: form.doctorSlogan.value.trim(),
+      contactPhone: form.contactPhone.value.trim(),
+      contactEmail: form.contactEmail.value.trim(),
+      contactAddress: form.contactAddress.value.trim(),
+      contactWebsite: form.contactWebsite.value.trim(),
+      createdAt: new Date().toISOString()
+    };
+
+    try {
+      await openDB();
+      const tx = db.transaction(storeName, 'readwrite');
+      const store = tx.objectStore(storeName);
+      const request = store.add(data);
+      request.onsuccess = () => {
+        message.style.color = 'green';
+        message.textContent = 'Prescription saved successfully.';
+        form.reset();
+        syncHeader();
+      };
+      request.onerror = () => {
+        message.style.color = 'var(--accent-color)';
+        message.textContent = 'Error saving prescription, try again.';
+      };
+      await tx.complete;
+    } catch {
+      message.style.color = 'var(--accent-color)';
+      message.textContent = 'Error opening database, try again.';
+    }
+  }
+
+  // Load saved prescriptions (basic picker UI)
+  async function loadPrescription() {
+    message.textContent = '';
+    try {
+      await openDB();
+      const tx = db.transaction(storeName, 'readonly');
+      const store = tx.objectStore(storeName);
+      const allRecords = await new Promise((res, rej) => {
+        const req = store.getAll();
+        req.onsuccess = () => res(req.result);
+        req.onerror = () => rej('Error loading records');
+      });
+      if (!allRecords.length) {
+        alert('No saved prescriptions found.');
+        return;
+      }
+      // Show prompt with list to choose record
+      const choices = allRecords
+        .map((r, i) => `${i + 1}. ${r.patientName} (${r.prescriptionDate || r.createdAt.slice(0,10)})`)
+        .join('\n');
+      const input = prompt(`Choose prescription to load:\n${choices}\nEnter number or cancel:`);
+      if (!input) return;
+      const idx = parseInt(input.trim(), 10) - 1;
+      if (isNaN(idx) || idx < 0 || idx >= allRecords.length) {
+        alert('Invalid choice.');
+        return;
+      }
+      const record = allRecords[idx];
+      // Populate form
+      form.patientName.value = record.patientName || '';
+      form.patientAddress.value = record.patientAddress || '';
+      form.patientAge.value = record.patientAge || '';
+      form.prescriptionDate.value = record.prescriptionDate || '';
+      form.diagnosis.value = record.diagnosis || '';
+      form.prescriptionRx.value = record.prescriptionRx || '';
+      form.doctorName.value = record.doctorName || '';
+      form.doctorQualification.value = record.doctorQualification || '';
+      form.certificationNo.value = record.certificationNo || '';
+      form.hospitalName.value = record.hospitalName || '';
+      form.doctorSlogan.value = record.doctorSlogan || '';
+      form.contactPhone.value = record.contactPhone || '';
+      form.contactEmail.value = record.contactEmail || '';
+      form.contactAddress.value = record.contactAddress || '';
+      form.contactWebsite.value = record.contactWebsite || '';
+      syncHeader();
+      message.style.color = 'var(--primary-color)';
+      message.textContent = 'Prescription loaded. You can edit or print now.';
+    } catch {
+      message.style.color = 'var(--accent-color)';
+      message.textContent = 'Error loading prescriptions.';
+    }
+  }
+
+  // Show print preview modal with data
+  function showPrintPreview() {
+    message.textContent = '';
+    const err = validateForm();
+    if (err) {
+      message.textContent = err;
+      message.style.color = 'var(--accent-color)';
+      return;
+    }
+    const data = {
+      patientName: form.patientName.value.trim(),
+      patientAddress: form.patientAddress.value.trim(),
+      patientAge: form.patientAge.value.trim(),
+      prescriptionDate: form.prescriptionDate.value || new Date().toISOString().slice(0,10),
+      diagnosis: form.diagnosis.value.trim(),
+      prescriptionRx: form.prescriptionRx.value.trim(),
+      doctorName: form.doctorName.value.trim() || 'Dr. John Doe, MBBS, MD',
+      doctorQualification: form.doctorQualification.value.trim() || 'Certified General Physician',
+      certificationNo: form.certificationNo.value.trim(),
+      hospitalName: form.hospitalName.value.trim() || 'City Hospital',
+      doctorSlogan: form.doctorSlogan.value.trim() || '"Caring for your health with compassion"',
+      contactPhone: form.contactPhone.value.trim(),
+      contactEmail: form.contactEmail.value.trim(),
+      contactAddress: form.contactAddress.value.trim(),
+      contactWebsite: form.contactWebsite.value.trim()
+    };
+    printArea.innerHTML = generatePrintHTML(data);
+    previewModal.style.display = 'flex';
+    printArea.focus();
+  }
+
+  // Print and close preview
+  function printAndClose() {
+    window.print();
+  }
+  // Close preview
+  function closePreview() {
+    previewModal.style.display = 'none';
+    printArea.innerHTML = '';
+  }
+
+  // Security & Privacy recommendations (in comments)
+  /*
+    - This is purely front-end storage (IndexedDB). For real patient data, use encrypted storage & backend with strict access controls.
+    - Here, local encryption could be added before storage (not implemented for demo).
+    - Clear data on reset to minimize residual data.
+    - Use HTTPS for any real deployment.
+  */
+
+  // Event Listeners
+  saveBtn.addEventListener('click', savePrescription);
+  loadBtn.addEventListener('click', loadPrescription);
+  previewBtn.addEventListener('click', showPrintPreview);
+  printNowBtn.addEventListener('click', printAndClose);
+  closePreviewBtn.addEventListener('click', closePreview);
+
+  // Accessibility: Close preview on ESC key
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && previewModal.style.display === 'flex') {
+      closePreview();
+    }
+  });
+
+  // Set default date for prescriptionDate field to today
+  const todayISOString = new Date().toISOString().slice(0,10);
+  if (!form.prescriptionDate.value) form.prescriptionDate.value = todayISOString;
+
+})();
+</script>
+
+</body>
+</html>
